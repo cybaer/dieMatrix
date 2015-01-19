@@ -4,6 +4,7 @@
 #include "avrlib/parallel_io.h"
 #include "avrlib/devices/shift_register.h"
 #include "avrlib/spi.h"
+#include "mcp23s17.h"
 
 using namespace avrlib;
 
@@ -13,26 +14,12 @@ static const uint8_t tcount = 160;      // Zählwert für 125kHz (20000 / 125)
 ParallelPort<PortC, PARALLEL_BYTE> outp;
 ParallelPort<PortD, PARALLEL_BYTE> inp;
 
-SpiMaster<NumberedGpio<4>, MSB_FIRST, 4> spi_interface;
+typedef SpiMaster<NumberedGpio<4>, MSB_FIRST, 4> spi_master;
+//spi_master spi_interface;
+MCP23S17<spi_master> portExtender;
+MCP23S17<spi_master, 2> portExtender2;
 
-void Mcp23s17Write(uint8_t address, uint8_t data)
-{
-  spi_interface.Begin();
-  spi_interface.Send(0x40);
-  spi_interface.Send(address);
-  spi_interface.Send(data);
-  spi_interface.End();
-}
 
-uint8_t Mcp23s17Read(uint8_t address)
-{
-  spi_interface.Begin();
-  spi_interface.Send(0x41);
-  spi_interface.Send(address);
-  uint8_t data = spi_interface.Receive();
-  spi_interface.End();
-  return data;
-}
 
 
 void initTimer0(void)
@@ -114,26 +101,28 @@ int main(void) {
   outp.Write(0xff);
   /*reg.Init();
   regOut.Init();*/
-  spi_interface.Init();
+  spi_master::Init();
 
   _delay_ms(5);
 
 
   // init MCP...
-  Mcp23s17Write(0 /* IODIRA */, 0x00);
-  Mcp23s17Write(1 /* IODIRB */, 0xFF);
-  Mcp23s17Write(2 /* IOPOLA */, 0x00);
-  Mcp23s17Write(3 /* IOPOLB */, 0x00);
-  Mcp23s17Write(0x0C /* GPPUA */, 0);
-  Mcp23s17Write(0x0D /* GPPUB */, 0xFF);
-  Mcp23s17Write(0x13 /* GPIOB */, 0);  //reset input
+  portExtender.Write(0 /* IODIRA */, 0x00);
+  portExtender.Write(1 /* IODIRB */, 0xFF);
+  portExtender.Write(2 /* IOPOLA */, 0x00);
+  portExtender.Write(3 /* IOPOLB */, 0x00);
+  portExtender.Write(0x0C /* GPPUA */, 0);
+  portExtender.Write(0x0D /* GPPUB */, 0xFF);
+  portExtender.Write(0x13 /* GPIOB */, 0);  //reset input
+
+  portExtender2.Write(0 /* IODIRA */, 0x00);
 
   while(1)
   {
     _delay_ms(5);
-    uint8_t switches = Mcp23s17Read(0x13 /* GPIOB */);
+    uint8_t switches = portExtender.Read(0x13 /* GPIOB */);
     //outp.Write(switches);
-    Mcp23s17Write(0x12 /* GPIOA */, switches);
+    portExtender.Write(0x12 /* GPIOA */, switches);
     //Mcp23s17Write(0x13 /* GPIOB */, 0xff);
 
   }
