@@ -8,7 +8,6 @@
 using namespace avrlib;
 
 static const uint8_t tcount = 160;      // Zählwert für 125kHz (20000 / 125)
-static uint16_t test = 0xffff;
 
 //ParallelPort<PortA, PARALLEL_BYTE> testPort;
 ParallelPort<PortC, PARALLEL_BYTE> outp;
