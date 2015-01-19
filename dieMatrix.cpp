@@ -118,6 +118,7 @@ int main(void) {
 
   _delay_ms(5);
 
+
   // init MCP...
   Mcp23s17Write(0 /* IODIRA */, 0x00);
   Mcp23s17Write(1 /* IODIRB */, 0xFF);
