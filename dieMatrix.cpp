@@ -1,6 +1,6 @@
 //#include <avr/io.h>           // Header-Datei f. IO-Register
-#include <avr/interrupt.h>   // Header-Datei f. Interruptfunktion
-//#include <stdint.h>          // Header-Datei f. standard Datentypen
+#include <avr/interrupt.h>      // Header-Datei f. Interruptfunktion
+//#include <stdint.h>           // Header-Datei f. standard Datentypen
 #include "avrlib/parallel_io.h"
 #include "avrlib/devices/shift_register.h"
 #include "avrlib/spi.h"
