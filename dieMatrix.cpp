@@ -135,6 +135,5 @@ int main(void) {
     Mcp23s17Write(0x12 /* GPIOA */, switches);
     //Mcp23s17Write(0x13 /* GPIOB */, 0xff);
 
-
   }
 }
