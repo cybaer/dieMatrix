@@ -15,7 +15,6 @@ ParallelPort<PortD, PARALLEL_BYTE> inp;
 
 SpiMaster<NumberedGpio<4>, MSB_FIRST, 4> spi_interface;
 
-
 void Mcp23s17Write(uint8_t address, uint8_t data)
 {
   spi_interface.Begin();
