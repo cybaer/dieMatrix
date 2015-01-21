@@ -9,7 +9,9 @@
 #define MCP23S17_H_
 
 #include "avrlib/spi.h"
+#include "avrlib/gpio.h"
 
+namespace avrlib {
 
 static const uint8_t MCP23S17_WRITE    = 0x00;
 static const uint8_t MCP23S17_READ     = 0x01;
@@ -41,7 +43,7 @@ template<typename spi_master, uint8_t addr = 0>
 class MCP23S17
 {
 public:
-  void Write(uint8_t address, uint8_t data)
+  static inline void  Write(uint8_t address, uint8_t data)
   {
     spi_master::Begin();
     spi_master::Send(slaveAddress | MCP23S17_WRITE);
@@ -50,7 +52,7 @@ public:
     spi_master::End();
   }
 
-  uint8_t Read(uint8_t address)
+  static inline uint8_t Read(uint8_t address)
   {
     spi_master::Begin();
     spi_master::Send(slaveAddress | MCP23S17_READ);
@@ -58,6 +60,26 @@ public:
     uint8_t data = spi_master::Receive();
     spi_master::End();
     return data;
+  }
+
+  static inline void setModePortA(uint8_t mode, uint8_t pins = 0xFF)
+  {
+    uint8_t direction = mode == DIGITAL_OUTPUT ? ~pins : pins;
+    Write(MCP23S17_IODIRA, direction);
+  }
+  static inline void setModePortB(uint8_t mode, uint8_t pins = 0xFF)
+  {
+    const uint8_t direction = mode == DIGITAL_OUTPUT ? ~pins : pins;
+    Write(MCP23S17_IODIRB, direction);
+  }
+
+  static inline void setPullUpPortA(uint8_t pins = 0xFF)
+  {
+    Write(MCP23S17_GPPUA, pins);
+  }
+  static inline void setPullUpPortB(uint8_t pins = 0xFF)
+  {
+    Write(MCP23S17_GPPUB, pins);
   }
 
   /*
@@ -91,5 +113,5 @@ char  read_interrupt_capture (Port port)
 private:
   static const uint8_t slaveAddress = 0x40 | (addr << 1);
 };
-
+}
 #endif /* MCP23S17_H_ */
