@@ -105,14 +105,17 @@ int main(void) {
 
   _delay_ms(5);
 
-
   // init MCP...
-  portExtender.Write(0 /* IODIRA */, 0x00);
-  portExtender.Write(1 /* IODIRB */, 0xFF);
+  //portExtender.Write(0 /* IODIRA */, 0x00);
+  portExtender.setModePortA(DIGITAL_OUTPUT);
+  //portExtender.Write(1 /* IODIRB */, 0xFF);
+  portExtender.setModePortB(DIGITAL_INPUT);
   portExtender.Write(2 /* IOPOLA */, 0x00);
   portExtender.Write(3 /* IOPOLB */, 0x00);
-  portExtender.Write(0x0C /* GPPUA */, 0);
-  portExtender.Write(0x0D /* GPPUB */, 0xFF);
+  //portExtender.Write(0x0C /* GPPUA */, 0);
+  portExtender.setPullUpPortA(0x00);
+  //portExtender.Write(0x0D /* GPPUB */, 0xFF);
+  portExtender.setPullUpPortB(0xFF);
   portExtender.Write(0x13 /* GPIOB */, 0);  //reset input
 
   portExtender2.Write(0 /* IODIRA */, 0x00);
