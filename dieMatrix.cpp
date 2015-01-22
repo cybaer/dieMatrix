@@ -16,10 +16,8 @@ ParallelPort<PortD, PARALLEL_BYTE> inp;
 
 typedef SpiMaster<NumberedGpio<4>, MSB_FIRST, 4> spi_master;
 //spi_master spi_interface;
-MCP23S17<spi_master> portExtender;
-MCP23S17<spi_master, 2> portExtender2;
-
-
+typedef MCP23S17<spi_master> portExtender;
+typedef MCP23S17<spi_master, 2> portExtender2;
 
 
 void initTimer0(void)
@@ -107,25 +105,25 @@ int main(void) {
 
   // init MCP...
   //portExtender.Write(0 /* IODIRA */, 0x00);
-  portExtender.setModePortA(DIGITAL_OUTPUT);
+  portExtender::setModePortA(DIGITAL_OUTPUT);
   //portExtender.Write(1 /* IODIRB */, 0xFF);
-  portExtender.setModePortB(DIGITAL_INPUT);
-  portExtender.Write(2 /* IOPOLA */, 0x00);
-  portExtender.Write(3 /* IOPOLB */, 0x00);
+  portExtender::setModePortB(DIGITAL_INPUT);
+  portExtender::Write(2 /* IOPOLA */, 0x00);
+  portExtender::Write(3 /* IOPOLB */, 0x00);
   //portExtender.Write(0x0C /* GPPUA */, 0);
-  portExtender.setPullUpPortA(0x00);
+  portExtender::setPullUpPortA(0x00);
   //portExtender.Write(0x0D /* GPPUB */, 0xFF);
-  portExtender.setPullUpPortB(0xFF);
-  portExtender.Write(0x13 /* GPIOB */, 0);  //reset input
+  portExtender::setPullUpPortB(0xFF);
+  portExtender::Write(0x13 /* GPIOB */, 0);  //reset input
 
-  portExtender2.Write(0 /* IODIRA */, 0x00);
+  portExtender2::Write(0 /* IODIRA */, 0x00);
 
   while(1)
   {
     _delay_ms(5);
-    uint8_t switches = portExtender.Read(0x13 /* GPIOB */);
+    uint8_t switches = portExtender::Read(0x13 /* GPIOB */);
     //outp.Write(switches);
-    portExtender.Write(0x12 /* GPIOA */, switches);
+    portExtender::Write(0x12 /* GPIOA */, switches);
     //Mcp23s17Write(0x13 /* GPIOB */, 0xff);
 
   }

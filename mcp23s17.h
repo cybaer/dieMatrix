@@ -108,8 +108,6 @@ char  read_interrupt_capture (Port port)
    * */
 
 
-
-
 private:
   static const uint8_t slaveAddress = 0x40 | (addr << 1);
 };
