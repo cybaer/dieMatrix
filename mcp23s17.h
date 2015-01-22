@@ -39,6 +39,7 @@ static const uint8_t MCP23S17_OLATA   = 0x14;       // A write to this register 
 static const uint8_t MCP23S17_OLATB   = 0x15;       // A write to this register modifies the output latches that modifies the pins configured as outputs for Port B
 
 
+
 template<typename spi_master, uint8_t addr = 0>
 class MCP23S17
 {
@@ -61,6 +62,20 @@ public:
     spi_master::End();
     return data;
   }
+
+template<uint8_t IODIR>
+class Port
+{
+public:
+  static inline void setMode(uint8_t mode, uint8_t pins = 0xFF)
+  {
+    uint8_t direction = mode == DIGITAL_OUTPUT ? ~pins : pins;
+    Write(IODIR, direction);
+  }
+};
+
+
+typedef Port<MCP23S17_IODIRA> PortA;
 
   static inline void setModePortA(uint8_t mode, uint8_t pins = 0xFF)
   {
