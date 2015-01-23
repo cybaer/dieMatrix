@@ -18,7 +18,8 @@ typedef SpiMaster<NumberedGpio<4>, MSB_FIRST, 4> spi_master;
 //spi_master spi_interface;
 typedef MCP23S17<spi_master> portExtender;
 
-
+typedef PortA<portExtender> PortExt1Out;
+typedef PortB<portExtender> PortExt1In;
 
 typedef MCP23S17<spi_master, 2> portExtender2;
 
