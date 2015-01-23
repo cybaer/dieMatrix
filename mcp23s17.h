@@ -77,6 +77,13 @@ public:
 
 typedef Port<MCP23S17_IODIRA> PortA;
 
+template<uint8_t register>
+static void setMode(uint8_t mode, uint8_t pins = 0xFF)
+{
+    uint8_t direction = mode == DIGITAL_OUTPUT ? ~pins : pins;
+    Write(register, direction);
+  }
+
   static inline void setModePortA(uint8_t mode, uint8_t pins = 0xFF)
   {
     uint8_t direction = mode == DIGITAL_OUTPUT ? ~pins : pins;
