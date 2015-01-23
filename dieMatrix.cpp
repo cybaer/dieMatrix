@@ -17,6 +17,9 @@ ParallelPort<PortD, PARALLEL_BYTE> inp;
 typedef SpiMaster<NumberedGpio<4>, MSB_FIRST, 4> spi_master;
 //spi_master spi_interface;
 typedef MCP23S17<spi_master> portExtender;
+
+
+
 typedef MCP23S17<spi_master, 2> portExtender2;
 
 
@@ -105,6 +108,7 @@ int main(void) {
 
   // init MCP...
   //portExtender.Write(0 /* IODIRA */, 0x00);
+  portExtender::setMode<PortA>(DIGITAL_OUTPUT)
   portExtender::setModePortA(DIGITAL_OUTPUT);
   //portExtender.Write(1 /* IODIRB */, 0xFF);
   portExtender::setModePortB(DIGITAL_INPUT);
