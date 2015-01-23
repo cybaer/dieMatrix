@@ -109,7 +109,9 @@ int main(void) {
 
   // init MCP...
   //portExtender.Write(0 /* IODIRA */, 0x00);
-  portExtender::setMode<PortA>(DIGITAL_OUTPUT)
+  PortExt1Out::setMode(DIGITAL_OUTPUT);
+  
+  
   portExtender::setModePortA(DIGITAL_OUTPUT);
   //portExtender.Write(1 /* IODIRB */, 0xFF);
   portExtender::setModePortB(DIGITAL_INPUT);
