@@ -13,6 +13,9 @@
 
 namespace avrlib {
 
+static const uint8_t PORT_A = 0;
+static const uint8_t PORT_B = 1;
+
 static const uint8_t MCP23S17_WRITE    = 0x00;
 static const uint8_t MCP23S17_READ     = 0x01;
 
@@ -38,7 +41,12 @@ static const uint8_t MCP23S17_GPIOB   = 0x13;       // Reflects the value on the
 static const uint8_t MCP23S17_OLATA   = 0x14;       // A write to this register modifies the output latches that modifies the pins configured as outputs for Port A
 static const uint8_t MCP23S17_OLATB   = 0x15;       // A write to this register modifies the output latches that modifies the pins configured as outputs for Port B
 
-
+/*template<typename spi_master, uint8_t addr>
+class PortBase
+{
+  static spi_master SM;
+};
+*/
 
 template<typename spi_master, uint8_t addr = 0>
 class MCP23S17
@@ -63,75 +71,26 @@ public:
     return data;
   }
 
-template<uint8_t IODIR>
-class Port
+private:
+  static const uint8_t slaveAddress = 0x40 | (addr << 1);
+};
+
+
+template<typename Extender, uint8_t Port>
+class PortX
 {
 public:
   static inline void setMode(uint8_t mode, uint8_t pins = 0xFF)
   {
     uint8_t direction = mode == DIGITAL_OUTPUT ? ~pins : pins;
-    Write(IODIR, direction);
+    Extender::Write(MCP23S17_IODIRA + Port, direction);
   }
-};
-
-
-typedef Port<MCP23S17_IODIRA> PortA;
-
-template<uint8_t register>
-static void setMode(uint8_t mode, uint8_t pins = 0xFF)
-{
-    uint8_t direction = mode == DIGITAL_OUTPUT ? ~pins : pins;
-    Write(register, direction);
-  }
-
-  static inline void setModePortA(uint8_t mode, uint8_t pins = 0xFF)
+  static inline void setPullUp(uint8_t pins = 0xFF)
   {
-    uint8_t direction = mode == DIGITAL_OUTPUT ? ~pins : pins;
-    Write(MCP23S17_IODIRA, direction);
+    Extender::Write(MCP23S17_GPPUA + Port, pins);
   }
-  static inline void setModePortB(uint8_t mode, uint8_t pins = 0xFF)
-  {
-    const uint8_t direction = mode == DIGITAL_OUTPUT ? ~pins : pins;
-    Write(MCP23S17_IODIRB, direction);
-  }
-
-  static inline void setPullUpPortA(uint8_t pins = 0xFF)
-  {
-    Write(MCP23S17_GPPUA, pins);
-  }
-  static inline void setPullUpPortB(uint8_t pins = 0xFF)
-  {
-    Write(MCP23S17_GPPUB, pins);
-  }
-
-  /*
-   * void   config_control_register (char data)
-  Configure the control setting (IOCON register).
-void  config_pullups (Port port, char data)
-  Configure if the port pins has Pull ups or not (GPPUn register).
-void  config_direction (Port port, char data)
-  Configure the direction of the port pins (IODIRn register).
-void  config_polarity (Port port, char data)
-  Configure the input polarity of the port pins (IPOLn register).
-void  config_interrupt_enable (Port port, char data)
-  Configure if the port pins is interruptable or not (GPINTENn register).
-void  config_interrupt_control (Port port, char data)
-  Configure if the interrupts is compared to default value register or against the previous value (INTCONn register).
-void  config_mirror_interrupt (bool mirror)
-  Configure if the interrupts pins is connected internally or separated into intA and intB (default = separated).
-void  config_defaultvalue (Port port, char data)
-  Configure the default value that the interrupt value is compared to if it setup for use (DEFVALn register).
-void  config_interrupt_polarity (Polarity polarity)
-  Configure if the interrupts is active high or active low.
-char  read_interrupt_flag (Port port)
-  Read the interrupt flags for the port.
-char  read_interrupt_capture (Port port)
-  Read the value of the port captured the time the interrupt occurred (use this is for fast changing inputs).
-   * */
-
-
-private:
-  static const uint8_t slaveAddress = 0x40 | (addr << 1);
 };
 }
+
+
 #endif /* MCP23S17_H_ */

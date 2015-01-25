@@ -18,8 +18,8 @@ typedef SpiMaster<NumberedGpio<4>, MSB_FIRST, 4> spi_master;
 //spi_master spi_interface;
 typedef MCP23S17<spi_master> portExtender;
 
-typedef PortA<portExtender> PortExt1Out;
-typedef PortB<portExtender> PortExt1In;
+typedef PortX<portExtender, PORT_A> PortExt1Out;
+typedef PortX<portExtender, PORT_B> PortExt1In;
 
 typedef MCP23S17<spi_master, 2> portExtender2;
 
@@ -110,17 +110,14 @@ int main(void) {
   // init MCP...
   //portExtender.Write(0 /* IODIRA */, 0x00);
   PortExt1Out::setMode(DIGITAL_OUTPUT);
-  
-  
-  portExtender::setModePortA(DIGITAL_OUTPUT);
   //portExtender.Write(1 /* IODIRB */, 0xFF);
-  portExtender::setModePortB(DIGITAL_INPUT);
+  PortExt1In::setMode(DIGITAL_INPUT);
   portExtender::Write(2 /* IOPOLA */, 0x00);
   portExtender::Write(3 /* IOPOLB */, 0x00);
   //portExtender.Write(0x0C /* GPPUA */, 0);
-  portExtender::setPullUpPortA(0x00);
+  PortExt1Out::setPullUp(0x00);
   //portExtender.Write(0x0D /* GPPUB */, 0xFF);
-  portExtender::setPullUpPortB(0xFF);
+  PortExt1In::setPullUp(0xFF);
   portExtender::Write(0x13 /* GPIOB */, 0);  //reset input
 
   portExtender2::Write(0 /* IODIRA */, 0x00);
