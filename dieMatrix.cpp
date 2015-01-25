@@ -33,7 +33,6 @@ static void InitPorts(void)
   PortOut::setInvertPolarity(0x00);
   PortIn::setInvertPolarity(0xFF);
   PortOut::setPullUp(0x00);
-  //portExtender.Write(0x0D /* GPPUB */, 0xFF);
   PortIn::setPullUp(0xFF);
   PortIn::Write(0x00);  //reset input
 }
@@ -122,22 +121,15 @@ int main(void) {
 
   initTimer0();
   outp.Write(0xff);
-  /*reg.Init();
-  regOut.Init();*/
+
+  // init MCP's
   spi_master::Init();
-
-  _delay_ms(5);
-
-  // init MCP...
   InitAllPorts();
-
-  //portExtender2::Write(0 /* IODIRA */, 0x00);
 
   while(1)
   {
     _delay_ms(5);
     uint8_t switches = PortExt1_In::Read();
-    //outp.Write(switches);
     PortExt1_Out::Write(switches);
 
   }
