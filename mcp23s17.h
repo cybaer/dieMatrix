@@ -80,6 +80,14 @@ template<typename Extender, uint8_t Port>
 class PortX
 {
 public:
+  static inline void Write(uint8_t data)
+  {
+    Extender::Write(MCP23S17_GPIOA + Port, data);
+  }
+  static inline uint8_t Read(void)
+  {
+    return Extender::Read(MCP23S17_GPIOA + Port);
+  }
   static inline void setMode(uint8_t mode, uint8_t pins = 0xFF)
   {
     uint8_t direction = mode == DIGITAL_OUTPUT ? ~pins : pins;
@@ -88,6 +96,11 @@ public:
   static inline void setPullUp(uint8_t pins = 0xFF)
   {
     Extender::Write(MCP23S17_GPPUA + Port, pins);
+  }
+
+  static inline void setInvertPolarity(uint8_t pins = 0xFF)
+  {
+    Extender::Write(MCP23S17_IPOLA + Port, pins);
   }
 };
 }

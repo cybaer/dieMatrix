@@ -16,13 +16,34 @@ ParallelPort<PortD, PARALLEL_BYTE> inp;
 
 typedef SpiMaster<NumberedGpio<4>, MSB_FIRST, 4> spi_master;
 //spi_master spi_interface;
-typedef MCP23S17<spi_master> portExtender;
+typedef MCP23S17<spi_master, 0> portExtender1;
+typedef PortX<portExtender1, PORT_A> PortExt1_Out;
+typedef PortX<portExtender1, PORT_B> PortExt1_In;
 
-typedef PortX<portExtender, PORT_A> PortExt1Out;
-typedef PortX<portExtender, PORT_B> PortExt1In;
+typedef MCP23S17<spi_master, 1> portExtender2;
+typedef PortX<portExtender2, PORT_A> PortExt2_Out;
+typedef PortX<portExtender2, PORT_B> PortExt2_In;
 
-typedef MCP23S17<spi_master, 2> portExtender2;
 
+template<typename PortIn, typename PortOut>
+static void InitPorts(void)
+{
+  PortOut::setMode(DIGITAL_OUTPUT);
+  PortIn::setMode(DIGITAL_INPUT);
+  PortOut::setInvertPolarity(0x00);
+  PortIn::setInvertPolarity(0xFF);
+  PortOut::setPullUp(0x00);
+  //portExtender.Write(0x0D /* GPPUB */, 0xFF);
+  PortIn::setPullUp(0xFF);
+  PortIn::Write(0x00);  //reset input
+}
+
+inline void InitAllPorts(void)
+{
+  InitPorts<PortExt1_In, PortExt1_Out>();
+  InitPorts<PortExt2_In, PortExt2_Out>();
+  //InitPorts<PortExt3_In, PortExt3_Out>();
+}
 
 void initTimer0(void)
 {
@@ -108,27 +129,16 @@ int main(void) {
   _delay_ms(5);
 
   // init MCP...
-  //portExtender.Write(0 /* IODIRA */, 0x00);
-  PortExt1Out::setMode(DIGITAL_OUTPUT);
-  //portExtender.Write(1 /* IODIRB */, 0xFF);
-  PortExt1In::setMode(DIGITAL_INPUT);
-  portExtender::Write(2 /* IOPOLA */, 0x00);
-  portExtender::Write(3 /* IOPOLB */, 0x00);
-  //portExtender.Write(0x0C /* GPPUA */, 0);
-  PortExt1Out::setPullUp(0x00);
-  //portExtender.Write(0x0D /* GPPUB */, 0xFF);
-  PortExt1In::setPullUp(0xFF);
-  portExtender::Write(0x13 /* GPIOB */, 0);  //reset input
+  InitAllPorts();
 
-  portExtender2::Write(0 /* IODIRA */, 0x00);
+  //portExtender2::Write(0 /* IODIRA */, 0x00);
 
   while(1)
   {
     _delay_ms(5);
-    uint8_t switches = portExtender::Read(0x13 /* GPIOB */);
+    uint8_t switches = PortExt1_In::Read();
     //outp.Write(switches);
-    portExtender::Write(0x12 /* GPIOA */, switches);
-    //Mcp23s17Write(0x13 /* GPIOB */, 0xff);
+    PortExt1_Out::Write(switches);
 
   }
 }
