@@ -10,12 +10,11 @@ using namespace avrlib;
 
 static const uint8_t tcount = 160;      // Zählwert für 125kHz (20000 / 125)
 
-//ParallelPort<PortA, PARALLEL_BYTE> testPort;
 ParallelPort<PortC, PARALLEL_BYTE> outp;
 ParallelPort<PortD, PARALLEL_BYTE> inp;
 
 typedef SpiMaster<NumberedGpio<4>, MSB_FIRST, 4> spi_master;
-//spi_master spi_interface;
+
 typedef MCP23S17<spi_master, 0> portExtender1;
 typedef PortX<portExtender1, PORT_A> PortExt1_Out;
 typedef PortX<portExtender1, PORT_B> PortExt1_In;
@@ -114,10 +113,8 @@ ISR (TIMER0_COMPA_vect) {
 int main(void) {
   DDRA = (1 << DDA0)|(1 << DDA1);         // PortA0 als Ausgang für LED1
 
-//testPort.set_mode(DIGITAL_INPUT);
   outp.set_mode(DIGITAL_OUTPUT);
   inp.set_mode(DIGITAL_INPUT);
-  //inp.EnablePullUpResistors();
 
   initTimer0();
   outp.Write(0xff);
