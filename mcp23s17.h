@@ -41,7 +41,7 @@ namespace avrlib
   static const uint8_t MCP23S17_OLATA = 0x14; // A write to this register modifies the output latches that modifies the pins configured as outputs for Port A
   static const uint8_t MCP23S17_OLATB = 0x15; // A write to this register modifies the output latches that modifies the pins configured as outputs for Port B
 
-  template<typename spi_master, uint8_t addr = 0>
+  template<typename spi_master, uint8_t addr>
   class MCP23S17
   {
   public:

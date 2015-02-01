@@ -5,6 +5,7 @@
 #include "avrlib/devices/shift_register.h"
 #include "avrlib/spi.h"
 #include "mcp23s17.h"
+#include <limits.h>
 
 using namespace avrlib;
 
@@ -15,13 +16,13 @@ ParallelPort<PortD, PARALLEL_BYTE> inp;
 
 typedef SpiMaster<NumberedGpio<4>, MSB_FIRST, 4> spi_master;
 
-typedef MCP23S17<spi_master, 0> portExtender1;
-typedef PortX<portExtender1, PORT_A> PortExt1_Out;
-typedef PortX<portExtender1, PORT_B> PortExt1_In;
+typedef MCP23S17<spi_master, 3> portExtender1;
+typedef PortX<portExtender1, PORT_B> PortExt1_Out;
+typedef PortX<portExtender1, PORT_A> PortExt1_In;
 
 typedef MCP23S17<spi_master, 1> portExtender2;
-typedef PortX<portExtender2, PORT_A> PortExt2_Out;
-typedef PortX<portExtender2, PORT_B> PortExt2_In;
+typedef PortX<portExtender2, PORT_B> PortExt2_Out;
+typedef PortX<portExtender2, PORT_A> PortExt2_In;
 
 
 template<typename PortIn, typename PortOut>
@@ -38,8 +39,14 @@ static void InitPorts(void)
 
 inline void InitAllPorts(void)
 {
+  spi_master::Begin();
+  spi_master::Send(0x40);  //0x48
+  spi_master::Send(MCP23S17_IOCON);
+  spi_master::Send(0x08);  // HAEN=1 (Enable Addressing)
+  spi_master::End();
+
   InitPorts<PortExt1_In, PortExt1_Out>();
-  InitPorts<PortExt2_In, PortExt2_Out>();
+  // InitPorts<PortExt2_In, PortExt2_Out>();
   //InitPorts<PortExt3_In, PortExt3_Out>();
 }
 
@@ -122,12 +129,25 @@ int main(void) {
   // init MCP's
   spi_master::Init();
   InitAllPorts();
+uint8_t count = 0;
 
   while(1)
   {
     _delay_ms(5);
     uint8_t switches = PortExt1_In::Read();
-    PortExt1_Out::Write(switches);
+    //_delay_ms(1);
+    uint8_t v = switches;     // input bits to be reversed
+    uint8_t r = v; // r will be reversed bits of v; first get LSB of v
+    int8_t s = sizeof(v) * CHAR_BIT - 1; // extra shift needed at end
+
+    for (v >>= 1; v; v >>= 1)
+    {
+      r <<= 1;
+      r |= v & 1;
+      s--;
+    }
+    r <<= s; // shift when v's highest bits are zero
+    PortExt1_Out::Write(r);
 
   }
 }
