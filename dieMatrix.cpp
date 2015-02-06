@@ -46,7 +46,7 @@ inline void InitAllPorts(void)
   spi_master::End();
 
   InitPorts<PortExt1_In, PortExt1_Out>();
-  // InitPorts<PortExt2_In, PortExt2_Out>();
+  InitPorts<PortExt2_In, PortExt2_Out>();
   //InitPorts<PortExt3_In, PortExt3_Out>();
 }
 
@@ -135,7 +135,9 @@ uint8_t count = 0;
   {
     _delay_ms(5);
     uint8_t switches = PortExt1_In::Read();
+    uint8_t switches2 = PortExt2_In::Read();
     //_delay_ms(1);
+
     uint8_t v = switches;     // input bits to be reversed
     uint8_t r = v; // r will be reversed bits of v; first get LSB of v
     int8_t s = sizeof(v) * CHAR_BIT - 1; // extra shift needed at end
@@ -148,6 +150,6 @@ uint8_t count = 0;
     }
     r <<= s; // shift when v's highest bits are zero
     PortExt1_Out::Write(r);
-
+    PortExt2_Out::Write(switches2 != 0 ? 0xFF : 0);
   }
 }
