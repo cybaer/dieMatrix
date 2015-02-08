@@ -41,10 +41,20 @@ namespace avrlib
   static const uint8_t MCP23S17_OLATA = 0x14; // A write to this register modifies the output latches that modifies the pins configured as outputs for Port A
   static const uint8_t MCP23S17_OLATB = 0x15; // A write to this register modifies the output latches that modifies the pins configured as outputs for Port B
 
+
+  struct Registers
+  {
+    uint8_t Gpio;
+    uint8_t IoDir;
+    uint8_t Gppu;
+
+  };
+
   template<typename spi_master, uint8_t addr>
   class MCP23S17
   {
   public:
+
     static inline void Write(uint8_t address, uint8_t data)
     {
       spi_master::Begin();
@@ -64,9 +74,76 @@ namespace avrlib
       return data;
     }
 
+    static inline void ReadIO(void)
+    {
+      Ports[PORT_A].Gpio = Read(MCP23S17_GPIOA);
+      Ports[PORT_B].Gpio = Read(MCP23S17_GPIOB);
+    }
+    static inline void WriteIO(void)
+    {
+      Write(MCP23S17_GPIOB, Ports[PORT_A].Gpio);
+      Write(MCP23S17_GPIOB, Ports[PORT_B].Gpio);
+    }
+
+    static inline void Init(void)
+    {
+      Write(MCP23S17_IODIRA, Ports[PORT_A].IoDir);
+      Write(MCP23S17_IODIRB, Ports[PORT_B].IoDir);
+      Write(MCP23S17_GPPUA, Ports[PORT_A].Gppu);
+      Write(MCP23S17_GPPUB, Ports[PORT_B].Gppu);
+    }
+
+    static Registers Ports[2];
+
   private:
     static const uint8_t slaveAddress = 0x40 | (addr << 1);
+
   };
+
+  // funktioniert, aber warum?
+  template<typename spi_master, uint8_t addr>
+  Registers MCP23S17<spi_master, addr>::Ports[2];
+
+  template<typename Extender, uint8_t Port, uint8_t Pin>
+  class PortPin
+  {
+  public:
+    static void clear()
+    {
+      Extender::Ports[Port].Gpio &= ~_BV(Pin);
+    }
+    static void set()
+    {
+      Extender::Ports[Port].Gpio |= _BV(Pin);
+    }
+    static void toggle()
+    {
+      Extender::Ports[Port].Gpio ^= _BV(Pin);
+    }
+    static uint8_t value()
+    {
+      return Extender::Ports[Port].Gpio & _BV(Pin) ? 1 : 0;
+    }
+    static void setMode(uint8_t mode)
+    {
+      if(mode == DIGITAL_INPUT)
+      {
+        Extender::Ports[Port].IoDir |= _BV(Pin);
+      }
+      else
+      {
+        Extender::Ports[Port].IoDir &= ~_BV(Pin);
+      }
+    }
+    static void setPullUp()
+    {
+      Extender::Ports[Port].Gppu |= _BV(Pin);
+    }
+  };
+
+
+
+
 
   template<typename Extender, uint8_t Port>
   class PortX

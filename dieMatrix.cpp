@@ -4,8 +4,11 @@
 #include "avrlib/parallel_io.h"
 #include "avrlib/devices/shift_register.h"
 #include "avrlib/spi.h"
+#include "avrlib/gpio.h"
 #include "mcp23s17.h"
 #include <limits.h>
+
+#include "ui.h"
 
 using namespace avrlib;
 
@@ -14,16 +17,15 @@ static const uint8_t tcount = 160;      // Zählwert für 125kHz (20000 / 125)
 ParallelPort<PortC, PARALLEL_BYTE> outp;
 ParallelPort<PortD, PARALLEL_BYTE> inp;
 
-typedef SpiMaster<NumberedGpio<4>, MSB_FIRST, 4> spi_master;
 
 typedef MCP23S17<spi_master, 3> portExtender1;
 typedef PortX<portExtender1, PORT_B> PortExt1_Out;
 typedef PortX<portExtender1, PORT_A> PortExt1_In;
 
-typedef MCP23S17<spi_master, 1> portExtender2;
-typedef PortX<portExtender2, PORT_B> PortExt2_Out;
-typedef PortX<portExtender2, PORT_A> PortExt2_In;
 
+
+
+//NumberedGpio<18> SWITCH1;
 
 template<typename PortIn, typename PortOut>
 static void InitPorts(void)
@@ -46,7 +48,7 @@ inline void InitAllPorts(void)
   spi_master::End();
 
   InitPorts<PortExt1_In, PortExt1_Out>();
-  InitPorts<PortExt2_In, PortExt2_Out>();
+
   //InitPorts<PortExt3_In, PortExt3_Out>();
 }
 
@@ -129,13 +131,23 @@ int main(void) {
   // init MCP's
   spi_master::Init();
   InitAllPorts();
+  ui.Init();
+
+
+
 uint8_t count = 0;
+
+
+//LED_1::set();
+//portExtender2::Ports[0].Gpio |= _BV(1);
+//portExtender2::Ports[0].Gpio |= _BV(3);
+//portExtender2::WriteIO();
 
   while(1)
   {
     _delay_ms(5);
     uint8_t switches = PortExt1_In::Read();
-    uint8_t switches2 = PortExt2_In::Read();
+    //uint8_t switches2 = PortExt2_In::Read();
     //_delay_ms(1);
 
     uint8_t v = switches;     // input bits to be reversed
@@ -150,6 +162,9 @@ uint8_t count = 0;
     }
     r <<= s; // shift when v's highest bits are zero
     PortExt1_Out::Write(r);
-    PortExt2_Out::Write(switches2 != 0 ? 0xFF : 0);
+    //PortExt2_Out::Write(switches2 != 0 ? 0xFF : 0);
+
+    ui.Poll();
+    ui.Do();
   }
 }
