@@ -39,10 +39,10 @@ public:
   void Init(void)
   {
 
-    SW_1::setMode(DIGITAL_INPUT);
+    SW_1::set_mode(DIGITAL_INPUT);
     SW_1::setPullUp();
-    LED_1::setMode(DIGITAL_OUTPUT);
-    LED_2::setMode(DIGITAL_OUTPUT);
+    LED_1::set_mode(DIGITAL_OUTPUT);
+    LED_2::set_mode(DIGITAL_OUTPUT);
     portExtender2::Init();
   }
 
@@ -68,36 +68,47 @@ private:
 
 static Ui ui;
 
-/* ein Schalter, debounced */
-/*class Switch
+class SwitchBase
 {
 public:
-  Switch(int pxc in, bool pulledUp = true)
-  : m_Pin(pin)
-  , m_Active(!pulledUp)
-  , m_State(0xff)
+  SwitchBase(void)
+  : m_State(0xff)
   {}
-  void init()
-  {
-    pinMode(m_Pin,INPUT);
-    digitalWrite(m_Pin, m_Active ? LOW : HIGH);
-  };
-  byte refresh()
-  {
-    m_State = (m_State << 1) | (digitalRead(m_Pin) ? m_Active : !m_Active);
-    return m_State;
-  }
+  virtual void init(void) = 0;
+  virtual uint8_t refresh(void) = 0;
   bool released() { return m_State == 0x80; }
   bool pressed()  { return m_State == 0x7f; }
   bool active()   { return m_State == 0xff; }
   bool inactive() { return m_State == 0x00; }
-  byte getState() const { return m_State; }
+  uint8_t getState() const { return m_State; }
+
+protected:
+  uint8_t m_State;
+};
+
+/* ein Schalter, debounced */
+class Switch :public SwitchBase
+{
+public:
+  Switch(int pin, bool pulledUp = true)
+  : m_Pin(pin)
+  , m_Active(!pulledUp)
+  {}
+  void init()
+  {
+    //pinMode(m_Pin,INPUT);
+    //digitalWrite(m_Pin, m_Active ? LOW : HIGH);
+  };
+  uint8_t refresh()
+  {
+    //m_State = (m_State << 1) | (digitalRead(m_Pin) ? m_Active : !m_Active);
+    return m_State;
+  }
 
 private:
   int m_Pin;
   int m_Active;
-  byte m_State;
 
-  DISALLOW_COPY_AND_ASSIGN(CSwitch);
+  DISALLOW_COPY_AND_ASSIGN(Switch);
 };
-*/
+
