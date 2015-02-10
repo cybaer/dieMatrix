@@ -19,10 +19,8 @@ typedef MCP23S17<spi_master, 1> portExtender2;
 
 //typedef PortX<portExtender2, PORT_B> PortExt2_Out;
 //typedef PortX<portExtender2, PORT_A> PortExt2_In;
-typedef PortPin<portExtender2, PORT_A, 7> SW_1;
-typedef PortPin<portExtender2, PORT_A, 6> SW_2;
-typedef PortPin<portExtender2, PORT_A, 5> SW_3;
-typedef PortPin<portExtender2, PORT_A, 4> SW_4;
+
+
 
 typedef PortPin<portExtender2, PORT_B, 0> LED_1;
 typedef PortPin<portExtender2, PORT_B, 1> LED_2;
@@ -31,42 +29,6 @@ typedef PortPin<portExtender2, PORT_B, 3> LED_4;
 
 
 
-class Switch;
-
-class Ui
-{
-public:
-  void Init(void)
-  {
-
-    SW_1::set_mode(DIGITAL_INPUT);
-    SW_1::setPullUp();
-    LED_1::set_mode(DIGITAL_OUTPUT);
-    LED_2::set_mode(DIGITAL_OUTPUT);
-    portExtender2::Init();
-  }
-
-  void Poll(void)
-  {
-    portExtender2::ReadIO();
-  }
-
-  void Do(void)
-  {
-    if(SW_1::value())
-      LED_1::set();
-    else
-      LED_1::clear();
-
-    LED_2::set();
-    portExtender2::WriteIO();
-  }
-
-private:
-
-};
-
-static Ui ui;
 
 class SwitchBase
 {
@@ -87,28 +49,79 @@ protected:
 };
 
 /* ein Schalter, debounced */
-class Switch :public SwitchBase
+template<typename Extender, uint8_t Port, uint8_t PinNumber, uint8_t PullUp = 1>
+class Switch : public SwitchBase
 {
+  typedef PortPin<Extender, Port, PinNumber> Pin;
 public:
-  Switch(int pin, bool pulledUp = true)
-  : m_Pin(pin)
-  , m_Active(!pulledUp)
+  Switch()
   {}
-  void init()
+  void init(void)
   {
-    //pinMode(m_Pin,INPUT);
-    //digitalWrite(m_Pin, m_Active ? LOW : HIGH);
-  };
+    Pin::set_mode(DIGITAL_INPUT);
+    if(PullUp)
+      Pin::setPullUp();
+  }
   uint8_t refresh()
   {
-    //m_State = (m_State << 1) | (digitalRead(m_Pin) ? m_Active : !m_Active);
+    m_State = (m_State << 1) | (Pin::value() ? PullUp : !PullUp);
     return m_State;
   }
 
 private:
-  int m_Pin;
-  int m_Active;
 
   DISALLOW_COPY_AND_ASSIGN(Switch);
 };
+
+Switch<portExtender2, PORT_A, 7> SW_1;
+Switch<portExtender2, PORT_A, 6> SW_2;
+Switch<portExtender2, PORT_A, 5> SW_3;
+Switch<portExtender2, PORT_A, 4> SW_4;
+
+static SwitchBase* _4Switches[] = {&SW_1, &SW_2, &SW_3, &SW_4};
+
+class Ui
+{
+public:
+  void Init(void)
+  {
+
+    for(int i=0; i<4; i++)
+    {
+      _4Switches[i]->init();
+    }
+    LED_1::set_mode(DIGITAL_OUTPUT);
+    LED_2::set_mode(DIGITAL_OUTPUT);
+    portExtender2::Init();
+  }
+
+  void Poll(void)
+  {
+    portExtender2::ReadIO();
+    SW_1.refresh();
+    SW_2.refresh();
+    SW_3.refresh();
+    SW_4.refresh();
+  }
+
+  void Do(void)
+  {
+    if(SW_1.active())
+      LED_1::set();
+    else
+      LED_1::clear();
+
+    if(SW_4.active())
+      LED_2::set();
+    else
+      LED_2::clear();
+
+    portExtender2::WriteIO();
+  }
+
+private:
+
+};
+
+static Ui ui;
 
