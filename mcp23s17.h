@@ -81,7 +81,7 @@ namespace avrlib
     }
     static inline void WriteIO(void)
     {
-      Write(MCP23S17_GPIOB, Ports[PORT_A].Gpio);
+      Write(MCP23S17_GPIOA, Ports[PORT_A].Gpio);
       Write(MCP23S17_GPIOB, Ports[PORT_B].Gpio);
     }
 
