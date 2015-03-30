@@ -76,6 +76,21 @@ Switch<portExtender3, PORT_A, 6> SW_M3;
 Switch<portExtender3, PORT_A, 7> SW_M4;
 
 
+//Midi Hardware
+typedef Gpio<PortD, 5> MidiOut1;
+typedef Gpio<PortD, 4> MidiOut2;
+
+typedef Gpio<PortA, 7> MidiOut3;
+typedef Gpio<PortA, 6> MidiOut4;
+typedef Gpio<PortA, 5> MidiOut5;
+typedef Gpio<PortA, 4> MidiOut6;
+typedef Gpio<PortA, 3> MidiOut7;
+typedef Gpio<PortA, 2> MidiOut8;
+typedef Gpio<PortA, 1> MidiOut9;
+typedef Gpio<PortA, 0> MidiOut10;
+
+typedef Gpio<PortD, 7> MidiIn1;
+typedef Gpio<PortD, 6> MidiIn2;
 
 
 #endif /* HARDWARE_H_ */

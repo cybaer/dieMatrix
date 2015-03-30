@@ -9,6 +9,7 @@
 #include "ui.h"
 
 using namespace avrlib;
+typedef Gpio<PortB, 0> Debug1;
 
 static const uint8_t tcount = 160;      // Zählwert für 125kHz (20000 / 125)
 
@@ -46,64 +47,75 @@ void initTimer0(void)
   sei();                  // Global Interrupts aktivieren
 }
 
-static uint8_t MASK_0 = 0x01;
-static uint8_t MASK_1 = 0x02;
-static uint8_t MASK_2 = 0x04;
-static uint8_t MASK_3 = 0x08;
-static uint8_t MASK_4 = 0x10;
-static uint8_t MASK_5 = 0x80;
-static uint8_t MASK_6 = 0x40;
-static uint8_t MASK_7 = 0x80;
+static uint8_t MA_1 = 0x02;
+static uint8_t MA_2 = 0x00;
+static uint8_t MA_3 = 0x01;
+static uint8_t MA_4 = 0x01;
+static uint8_t MA_5 = 0x01;
+static uint8_t MA_6 = 0x01;
+static uint8_t MA_7 = 0x01;
+static uint8_t MA_8 = 0x01;
+static uint8_t MA_9 = 0x01;
+static uint8_t MA_10 = 0x00;
 
-static uint8_t bit = 0;
+static uint8_t MB_1 = 0x00;
+static uint8_t MB_2 = 0x00;
+static uint8_t MB_3 = 0x00;
+static uint8_t MB_4 = 0x00;
+static uint8_t MB_5 = 0x00;
+static uint8_t MB_6 = 0x04;
+static uint8_t MB_7 = 0x00;
+static uint8_t MB_8 = 0x00;
+static uint8_t MB_9 = 0x00;
+static uint8_t MB_10 = 0x08;
+
+ParallelPort<PortC, PARALLEL_BYTE> MidiIn_3_10;
+ParallelPort<PortD, PARALLEL_DOUBLE_HIGH> MidiIn_1_2;
 
 ISR (TIMER0_COMPA_vect) {
+  Debug1::set_value(true);
 
-  PORTA |= (1 << PA0);
-  uint8_t out = 0;
-  //uint8_t byte = 0;
-  uint8_t val = inp.Read();
 
-  if(val & MASK_7)
-    out |= 0x01;
-  out <<= 1;
-  if(val & MASK_6)
-    out |= 0x01;
-  out <<= 1;
-  if(val & MASK_5)
-    out |= 0x01;
-  out <<= 1;
-  if(val & MASK_4)
-    out |= 0x01;
-  out <<= 1;
+  uint8_t midi_1_2 = MidiIn_1_2.Read();
+  uint8_t midi_3_10 = MidiIn_3_10.Read();
 
-  if(val & MASK_3)
-    out |= 0x01;
-  out <<= 1;
+  MidiOut1::set_value((midi_1_2 & MA_1) || (midi_3_10 & MB_1));
+  MidiOut2::set_value((midi_1_2 & MA_2) || (midi_3_10 & MB_2));
+  MidiOut3::set_value((midi_1_2 & MA_3) || (midi_3_10 & MB_3));
+  MidiOut4::set_value((midi_1_2 & MA_4) || (midi_3_10 & MB_4));
+  MidiOut5::set_value((midi_1_2 & MA_5) || (midi_3_10 & MB_5));
+  MidiOut6::set_value((midi_1_2 & MA_6) || (midi_3_10 & MB_6));
+  MidiOut7::set_value((midi_1_2 & MA_7) || (midi_3_10 & MB_7));
+  MidiOut8::set_value((midi_1_2 & MA_8) || (midi_3_10 & MB_8));
+  MidiOut9::set_value((midi_1_2 & MA_9) || (midi_3_10 & MB_9));
+  MidiOut10::set_value((midi_1_2 & MA_10) || (midi_3_10 & MB_10));
 
-  if(val & MASK_2)
-    out |= 0x01;
-  out <<= 1;
-  if(val & MASK_1)
-    out |= 0x01;
-  out <<= 1;
-  if(val & MASK_0)
-    out |= 0x01;
-
-  outp.Write(out);
-
-  PORTA &= ~(1 << PA0);
+  Debug1::set_value(false);
 }
 
 int main(void) {
   _delay_ms(50);
-  DDRA = (1 << DDA0)|(1 << DDA1);         // PortA0 als Ausgang für LED1
 
-  outp.set_mode(DIGITAL_OUTPUT);
-  inp.set_mode(DIGITAL_INPUT);
+  MidiIn_3_10.set_mode(DIGITAL_INPUT);
+  MidiIn_1_2.set_mode(DIGITAL_INPUT);
+
+  MidiOut1::set_mode(DIGITAL_OUTPUT);
+  MidiOut2::set_mode(DIGITAL_OUTPUT);
+  MidiOut3::set_mode(DIGITAL_OUTPUT);
+  MidiOut4::set_mode(DIGITAL_OUTPUT);
+  MidiOut5::set_mode(DIGITAL_OUTPUT);
+  MidiOut6::set_mode(DIGITAL_OUTPUT);
+  MidiOut7::set_mode(DIGITAL_OUTPUT);
+  MidiOut8::set_mode(DIGITAL_OUTPUT);
+  MidiOut9::set_mode(DIGITAL_OUTPUT);
+  MidiOut10::set_mode(DIGITAL_OUTPUT);
+
+  Debug1::set_mode(DIGITAL_OUTPUT);
+  Debug1::set_value(false);
+
 
   initTimer0();
-  outp.Write(0xff);
+  //outp.Write(0xff);
 
   _delay_ms(20);
   // init MCP's
@@ -114,9 +126,10 @@ int main(void) {
 
   while(1)
   {
-    _delay_ms(5);
+    //_delay_ms(5);
 
     ui.Poll();
     ui.Do();
+
   }
 }
