@@ -89,8 +89,4 @@ typedef Gpio<PortA, 2> MidiOut8;
 typedef Gpio<PortA, 1> MidiOut9;
 typedef Gpio<PortA, 0> MidiOut10;
 
-typedef Gpio<PortD, 7> MidiIn1;
-typedef Gpio<PortD, 6> MidiIn2;
-
-
 #endif /* HARDWARE_H_ */

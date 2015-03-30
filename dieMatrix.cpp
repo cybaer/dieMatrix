@@ -13,9 +13,6 @@ typedef Gpio<PortB, 0> Debug1;
 
 static const uint8_t tcount = 160;      // Zählwert für 125kHz (20000 / 125)
 
-ParallelPort<PortA, PARALLEL_BYTE> outp;
-ParallelPort<PortC, PARALLEL_BYTE> inp;
-
 template<typename PortIn, typename PortOut>
 static void InitPorts(void)
 {
@@ -72,7 +69,8 @@ static uint8_t MB_10 = 0x08;
 ParallelPort<PortC, PARALLEL_BYTE> MidiIn_3_10;
 ParallelPort<PortD, PARALLEL_DOUBLE_HIGH> MidiIn_1_2;
 
-ISR (TIMER0_COMPA_vect) {
+ISR (TIMER0_COMPA_vect)
+{
   Debug1::set_value(true);
 
 
@@ -93,7 +91,8 @@ ISR (TIMER0_COMPA_vect) {
   Debug1::set_value(false);
 }
 
-int main(void) {
+int main(void)
+{
   _delay_ms(50);
 
   MidiIn_3_10.set_mode(DIGITAL_INPUT);
@@ -113,9 +112,7 @@ int main(void) {
   Debug1::set_mode(DIGITAL_OUTPUT);
   Debug1::set_value(false);
 
-
   initTimer0();
-  //outp.Write(0xff);
 
   _delay_ms(20);
   // init MCP's
@@ -127,9 +124,7 @@ int main(void) {
   while(1)
   {
     //_delay_ms(5);
-
     ui.Poll();
     ui.Do();
-
   }
 }
