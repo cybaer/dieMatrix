@@ -111,7 +111,7 @@ namespace avrlib
     static void clear(){ Extender::Ports[Port].Gpio &= ~_BV(Pin); }
     static void set(){ Extender::Ports[Port].Gpio |= _BV(Pin); }
     static void toggle(){ Extender::Ports[Port].Gpio ^= _BV(Pin); }
-    static uint8_t value(){ return Extender::Ports[Port].Gpio & _BV(Pin) ? 1 : 0; }
+    static uint8_t value(){ return Extender::Ports[Port].Gpio & _BV(Pin) ? 0 : 1; }
     static void set_mode(uint8_t mode)
     {
       if(mode == DIGITAL_INPUT)

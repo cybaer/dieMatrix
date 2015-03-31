@@ -9,6 +9,7 @@
 #define DEVICES_H_
 
 using namespace avrlib;
+static const int8_t NIL = 0xff;
 
 #include "mcp23s17.h"
 static const uint8_t SPI_Speed = 4;
@@ -158,6 +159,18 @@ public:
     {
       m_SwArray[i]->refresh();
     }
+  }
+  bool getPressed(int8_t& index) const
+  {
+    for(int8_t i=0; i<m_count; i++)
+    {
+      if(m_SwArray[i]->pressed())
+      {
+        index = i;
+        return true;
+      }
+    }
+    return false;
   }
   int8_t m_count;
   SwitchBase* m_SwArray[10];
