@@ -11,6 +11,11 @@
 using namespace avrlib;
 
 #include "mcp23s17.h"
+static const uint8_t SPI_Speed = 4;
+typedef SpiMaster<NumberedGpio<4>, MSB_FIRST, SPI_Speed> spi_master;
+typedef MCP23S17<spi_master, 1> portExtender1;
+typedef MCP23S17<spi_master, 3> portExtender2;
+typedef MCP23S17<spi_master, 7> portExtender3;
 
 class LED_Base
 {

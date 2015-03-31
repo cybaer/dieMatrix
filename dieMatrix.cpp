@@ -9,6 +9,19 @@
 #include "ui.h"
 
 using namespace avrlib;
+
+//Midi Hardware
+typedef Gpio<PortD, 5> MidiOut1;
+typedef Gpio<PortD, 4> MidiOut2;
+
+typedef Gpio<PortA, 7> MidiOut3;
+typedef Gpio<PortA, 6> MidiOut4;
+typedef Gpio<PortA, 5> MidiOut5;
+typedef Gpio<PortA, 4> MidiOut6;
+typedef Gpio<PortA, 3> MidiOut7;
+typedef Gpio<PortA, 2> MidiOut8;
+typedef Gpio<PortA, 1> MidiOut9;
+typedef Gpio<PortA, 0> MidiOut10;
 typedef Gpio<PortB, 0> Debug1;
 
 static const uint8_t tcount = 160;      // Zählwert für 125kHz (20000 / 125)
@@ -73,7 +86,6 @@ ISR (TIMER0_COMPA_vect)
 {
   Debug1::set_value(true);
 
-
   uint8_t midi_1_2 = MidiIn_1_2.Read();
   uint8_t midi_3_10 = MidiIn_3_10.Read();
 
@@ -108,6 +120,7 @@ int main(void)
   MidiOut8::set_mode(DIGITAL_OUTPUT);
   MidiOut9::set_mode(DIGITAL_OUTPUT);
   MidiOut10::set_mode(DIGITAL_OUTPUT);
+
 
   Debug1::set_mode(DIGITAL_OUTPUT);
   Debug1::set_value(false);
