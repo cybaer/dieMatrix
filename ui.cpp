@@ -16,6 +16,7 @@ Ui::Ui(void)
 , m_ModeLEDs(4, &LED_M1, &LED_M2, &LED_M3, &LED_M4)
 , m_ModeSwitches(4, &SW_M1, &SW_M2, &SW_M3, &SW_M4)
 , m_State(&Ui::CPlayState::getInstance())
+, m_modeSwitchIndex(NIL)
 {
 
 }
@@ -79,7 +80,19 @@ void Ui::CScanState::onModeClick(Ui& context, int8_t index) const
 }
 
 
+Ui::IUiState& Ui::determineNextModeState(int8_t modeSwitch)
+{
+  if(modeSwitch == m_modeSwitchIndex)
+  {
+    m_modeSwitchIndex = NIL;
+    return Ui::CPlayState::getInstance();
+  }
+  else
+  {
 
+  }
+
+}
 
 void Ui::testSwitchLED(void)
 {

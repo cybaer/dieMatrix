@@ -30,6 +30,9 @@ public:
 private:
   void testSwitchLED(void);
 
+  class IUiState;
+  IUiState& determineNextModeState(int8_t modeSwitch);
+
   LEDArray m_InputLEDs;
   SwitchArray m_InputSwitches;
   LEDArray m_OutputLEDs;
@@ -62,7 +65,7 @@ private:
   };
 
   /**
-   * State
+   * State machine
    */
   class CPlayState: public IUiState
   {
@@ -95,8 +98,8 @@ private:
     m_State->onEntry(*this);
   }
 
-  /** The internal State of this thing */
   IUiState* m_State;
+  int8_t m_modeSwitchIndex;
 };
 
 static Ui ui;
