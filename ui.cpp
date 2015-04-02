@@ -17,8 +17,14 @@ Ui::Ui(void)
 , m_ModeSwitches(4, &SW_M1, &SW_M2, &SW_M3, &SW_M4)
 , m_State(&Ui::CPlayState::getInstance())
 , m_modeSwitchIndex(NIL)
+, m_selectedInput(NIL)
+, m_selectedOutput(NIL)
 {
-
+  m_ModeStates[PlayMode] = &Ui::CPlayState::getInstance();
+  m_ModeStates[ScanMode] = &Ui::CScanState::getInstance();
+  m_ModeStates[RoutingMode] = &Ui::CRoutingState::getInstance();
+  m_ModeStates[StoreMode] = &Ui::CStoreState::getInstance();
+  m_ModeStates[ReadMode] = &Ui::CReadState::getInstance();
 }
 
 void Ui::Init(void)
@@ -51,6 +57,15 @@ void Ui::Do(void)
   {
     m_State->onModeClick(*this, modeIndex);
   }
+  if(m_InputSwitches.getPressed(modeIndex))
+  {
+    m_State->onInputClick(*this, modeIndex);
+  }
+  if(m_OutputSwitches.getPressed(modeIndex))
+  {
+    m_State->onOutputClick(*this, modeIndex);
+  }
+
   portExtender1::WriteIO();
   portExtender2::WriteIO();
   portExtender3::WriteIO();
@@ -65,8 +80,7 @@ void Ui::CPlayState::onEntry(Ui& context) const
 }
 void Ui::CPlayState::onModeClick(Ui& context, int8_t index) const
 {
-  if(index == 0)
-    context.setState(Ui::CScanState::getInstance());
+  context.setState(context.determineNextModeState(index));
 }
 void Ui::CScanState::onEntry(Ui& context) const
 {
@@ -75,10 +89,56 @@ void Ui::CScanState::onEntry(Ui& context) const
 }
 void Ui::CScanState::onModeClick(Ui& context, int8_t index) const
 {
-  if(index == 0)
-      context.setState(Ui::CPlayState::getInstance());
+  context.setState(context.determineNextModeState(index));
 }
 
+void Ui::CRoutingState::onEntry(Ui& context) const
+{
+  context.m_ModeLEDs.clear();
+  context.m_ModeLEDs.m_LedArray[1]->set();
+  context.m_InputLEDs.clear();
+  if(context.m_selectedInput != NIL)
+    context.m_InputLEDs.m_LedArray[context.m_selectedInput]->set();
+}
+void Ui::CRoutingState::onExit(Ui& context) const
+{
+  context.m_InputLEDs.clear();
+}
+void Ui::CRoutingState::onModeClick(Ui& context, int8_t index) const
+{
+  context.setState(context.determineNextModeState(index));
+}
+
+void Ui::CRoutingState::onInputClick(Ui& context, int8_t index) const
+{
+  context.m_selectedInput = index;
+  context.m_InputLEDs.clear();
+  context.m_InputLEDs.m_LedArray[context.m_selectedInput]->set();
+}
+void Ui::CRoutingState::onOutputClick(Ui& context, int8_t index) const
+{
+  context.m_OutputLEDs.clear();
+  context.m_OutputLEDs.m_LedArray[index]->toggle();
+}
+
+void Ui::CStoreState::onEntry(Ui& context) const
+{
+  context.m_ModeLEDs.clear();
+  context.m_ModeLEDs.m_LedArray[2]->set();
+}
+void Ui::CStoreState::onModeClick(Ui& context, int8_t index) const
+{
+  context.setState(context.determineNextModeState(index));
+}
+void Ui::CReadState::onEntry(Ui& context) const
+{
+  context.m_ModeLEDs.clear();
+  context.m_ModeLEDs.m_LedArray[3]->set();
+}
+void Ui::CReadState::onModeClick(Ui& context, int8_t index) const
+{
+  context.setState(context.determineNextModeState(index));
+}
 
 Ui::IUiState& Ui::determineNextModeState(int8_t modeSwitch)
 {
@@ -89,9 +149,9 @@ Ui::IUiState& Ui::determineNextModeState(int8_t modeSwitch)
   }
   else
   {
-
+    m_modeSwitchIndex = modeSwitch;
+    return *m_ModeStates[modeSwitch+1];
   }
-
 }
 
 void Ui::testSwitchLED(void)

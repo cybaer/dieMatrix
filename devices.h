@@ -24,6 +24,7 @@ public:
   virtual void init(void) = 0;
   virtual void set(void) = 0;
   virtual void clear(void) = 0;
+  virtual void toggle(void) = 0;
 };
 
 template<typename Extender, uint8_t Port, uint8_t PinNumber>
@@ -39,6 +40,7 @@ public:
   }
   void set(void) { Pin::set(); }
   void clear(void) { Pin::clear(); }
+  void toggle(void) { Pin::toggle(); }
 };
 
 class LEDArray

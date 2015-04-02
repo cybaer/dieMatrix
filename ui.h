@@ -18,6 +18,7 @@ using namespace avrlib;
 
 static const int8_t INPUT_COUNT = 10;
 static const int8_t OUTPUT_COUNT = 10;
+enum {PlayMode = 0, ScanMode, RoutingMode, StoreMode, ReadMode, ModeCount};
 
 class Ui
 {
@@ -40,23 +41,18 @@ private:
   LEDArray m_ModeLEDs;
   SwitchArray m_ModeSwitches;
 
+
   class IUiState
   {
   public:
     //** Empty Constructor */
-    IUiState(void)
-    {
-    }
+    IUiState(void) {}
+    virtual void onEntry(Ui&) const {}
+    virtual void onExit(Ui&) const {}
+    virtual void onModeClick(Ui&, int8_t index) const {}
+    virtual void onInputClick(Ui&, int8_t index) const {}
+    virtual void onOutputClick(Ui&, int8_t index) const {}
 
-    virtual void onEntry(Ui&) const
-    {
-    }
-    virtual void onExit(Ui&) const
-    {
-    }
-    virtual void onModeClick(Ui&, int8_t index) const
-    {
-    }
     //virtual void onLongClick(Ui&) const {}
 
   private:
@@ -90,6 +86,42 @@ private:
     virtual void onEntry(Ui&) const;
     virtual void onModeClick(Ui&, int8_t index) const;
   };
+  class CRoutingState: public IUiState
+  {
+  public:
+    static CRoutingState& getInstance(void)
+    {
+      static CRoutingState s_instance;
+      return s_instance;
+    }
+    virtual void onEntry(Ui&) const;
+    virtual void onExit(Ui&) const;
+    virtual void onModeClick(Ui&, int8_t index) const;
+    virtual void onInputClick(Ui&, int8_t index) const;
+    virtual void onOutputClick(Ui&, int8_t index) const;
+  };
+  class CStoreState: public IUiState
+  {
+  public:
+    static CStoreState& getInstance(void)
+    {
+      static CStoreState s_instance;
+      return s_instance;
+    }
+    virtual void onEntry(Ui&) const;
+    virtual void onModeClick(Ui&, int8_t index) const;
+  };
+  class CReadState: public IUiState
+  {
+  public:
+    static CReadState& getInstance(void)
+    {
+      static CReadState s_instance;
+      return s_instance;
+    }
+    virtual void onEntry(Ui&) const;
+    virtual void onModeClick(Ui&, int8_t index) const;
+  };
 
   void setState(IUiState& state)
   {
@@ -100,6 +132,9 @@ private:
 
   IUiState* m_State;
   int8_t m_modeSwitchIndex;
+  IUiState* m_ModeStates[ModeCount];
+  int8_t m_selectedInput;
+  int8_t m_selectedOutput;
 };
 
 static Ui ui;
