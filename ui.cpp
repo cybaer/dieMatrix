@@ -6,6 +6,7 @@
  */
 #include "hardware.h"
 #include "ui.h"
+#include "routing.h"
 
 
 Ui::Ui(void)
@@ -82,6 +83,16 @@ void Ui::CPlayState::onModeClick(Ui& context, int8_t index) const
 {
   context.setState(context.determineNextModeState(index));
 }
+void Ui::CPlayState::onInputClick(Ui& context, int8_t index) const
+{
+  context.m_InputLEDs.set(index);
+  context.m_OutputLEDs.set(routing.getOutBitsByIn(index));
+}
+void Ui::CPlayState::onOutputClick(Ui& context, int8_t index) const
+{
+  context.m_OutputLEDs.set(index);
+  context.m_InputLEDs.set(routing.getInByOut(index));
+}
 void Ui::CScanState::onEntry(Ui& context) const
 {
   context.m_ModeLEDs.clear();
@@ -91,18 +102,16 @@ void Ui::CScanState::onModeClick(Ui& context, int8_t index) const
 {
   context.setState(context.determineNextModeState(index));
 }
+///noch keine Funktion
+
 
 void Ui::CRoutingState::onEntry(Ui& context) const
 {
   context.m_ModeLEDs.clear();
   context.m_ModeLEDs.m_LedArray[1]->set();
   context.m_InputLEDs.clear();
-  if(context.m_selectedInput != NIL)
-    context.m_InputLEDs.m_LedArray[context.m_selectedInput]->set();
-}
-void Ui::CRoutingState::onExit(Ui& context) const
-{
-  context.m_InputLEDs.clear();
+  context.m_OutputLEDs.clear();
+
 }
 void Ui::CRoutingState::onModeClick(Ui& context, int8_t index) const
 {
@@ -111,15 +120,57 @@ void Ui::CRoutingState::onModeClick(Ui& context, int8_t index) const
 
 void Ui::CRoutingState::onInputClick(Ui& context, int8_t index) const
 {
-  context.m_selectedInput = index;
-  context.m_InputLEDs.clear();
-  context.m_InputLEDs.m_LedArray[context.m_selectedInput]->set();
+  context.m_InputLEDs.set(index);
+  routing.setRouteBeginIn(index);
+  context.m_OutputLEDs.set(routing.getOutBitsByIn(index));
+  context.setState(Ui::CRoutingByInState::getInstance());
 }
 void Ui::CRoutingState::onOutputClick(Ui& context, int8_t index) const
 {
-  context.m_OutputLEDs.clear();
-  context.m_OutputLEDs.m_LedArray[index]->toggle();
+  context.m_OutputLEDs.set(index);
+  routing.setRouteBeginOut(index);
+  context.m_InputLEDs.set(routing.getInByOut(index));
+  context.setState(Ui::CRoutingByOutState::getInstance());
 }
+
+
+
+void Ui::CRoutingByOutState::onExit(Ui& context) const
+{
+  context.m_InputLEDs.clear();
+  context.m_OutputLEDs.clear();
+}
+void Ui::CRoutingByOutState::onModeClick(Ui& context, int8_t index) const
+{
+  context.setState(context.determineNextModeState(index));
+}
+
+void Ui::CRoutingByOutState::onInputClick(Ui& context, int8_t index) const
+{
+  routing.setRouteByBeginOut(index);
+  context.m_InputLEDs.set(index);
+}
+/*void Ui::CRoutingByOutState::onOutputClick(Ui& context, int8_t index) const
+{
+}
+*/
+
+void Ui::CRoutingByInState::onExit(Ui& context) const
+{
+  context.m_InputLEDs.clear();
+  context.m_OutputLEDs.clear();
+}
+void Ui::CRoutingByInState::onModeClick(Ui& context, int8_t index) const
+{
+  context.setState(context.determineNextModeState(index));
+}
+void Ui::CRoutingByInState::onOutputClick(Ui& context, int8_t index) const
+{
+  routing.setRouteByBeginIn(index);
+  context.m_OutputLEDs.set(routing.getOutBitsByBeginIn());
+}
+
+
 
 void Ui::CStoreState::onEntry(Ui& context) const
 {

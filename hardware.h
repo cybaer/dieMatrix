@@ -14,9 +14,6 @@
 
 using namespace avrlib;
 
-
-
-
 LED<portExtender1, PORT_B, 7> LED_In1;
 LED<portExtender1, PORT_B, 6> LED_In2;
 LED<portExtender1, PORT_B, 5> LED_In3;
@@ -70,8 +67,5 @@ Switch<portExtender3, PORT_A, 4> SW_M1;
 Switch<portExtender3, PORT_A, 5> SW_M2;
 Switch<portExtender3, PORT_A, 6> SW_M3;
 Switch<portExtender3, PORT_A, 7> SW_M4;
-
-
-
 
 #endif /* HARDWARE_H_ */

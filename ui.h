@@ -16,6 +16,10 @@ extern "C" void __cxa_pure_virtual();
 
 using namespace avrlib;
 
+
+typedef Gpio<PortB, 0> Debug1;
+typedef Gpio<PortB, 1> Debug2;
+
 static const int8_t INPUT_COUNT = 10;
 static const int8_t OUTPUT_COUNT = 10;
 enum {PlayMode = 0, ScanMode, RoutingMode, StoreMode, ReadMode, ModeCount};
@@ -73,6 +77,8 @@ private:
     }
     virtual void onEntry(Ui&) const;
     virtual void onModeClick(Ui&, int8_t index) const;
+    virtual void onInputClick(Ui&, int8_t index) const;
+    virtual void onOutputClick(Ui&, int8_t index) const;
   };
 
   class CScanState: public IUiState
@@ -95,11 +101,38 @@ private:
       return s_instance;
     }
     virtual void onEntry(Ui&) const;
-    virtual void onExit(Ui&) const;
     virtual void onModeClick(Ui&, int8_t index) const;
     virtual void onInputClick(Ui&, int8_t index) const;
     virtual void onOutputClick(Ui&, int8_t index) const;
   };
+
+  class CRoutingByOutState: public IUiState
+  {
+  public:
+    static CRoutingByOutState& getInstance(void)
+    {
+      static CRoutingByOutState s_instance;
+      return s_instance;
+    }
+    virtual void onExit(Ui&) const;
+    virtual void onModeClick(Ui&, int8_t index) const;
+    virtual void onInputClick(Ui&, int8_t index) const;
+    //virtual void onOutputClick(Ui&, int8_t index) const;
+  };
+
+  class CRoutingByInState: public IUiState
+    {
+    public:
+      static CRoutingByInState& getInstance(void)
+      {
+        static CRoutingByInState s_instance;
+        return s_instance;
+      }
+      virtual void onExit(Ui&) const;
+      virtual void onModeClick(Ui&, int8_t index) const;
+      virtual void onOutputClick(Ui&, int8_t index) const;
+    };
+
   class CStoreState: public IUiState
   {
   public:
