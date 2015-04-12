@@ -39,6 +39,9 @@ void Ui::Init(void)
   portExtender1::Init();
   portExtender2::Init();
   portExtender3::Init();
+  Debug2::High();
+  routing.readDefaultData();
+  Debug2::Low();
 }
 
 void Ui::Poll(void)

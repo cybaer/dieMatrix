@@ -87,7 +87,7 @@ void initTimer0(void)
   TCNT0 = 0;              // set count
   OCR0A = tcount;         // compare value
   TIMSK0 |= (1 << OCIE0A);// CTC Interrupt einschalten
-  sei();                  // Global Interrupts aktivieren
+  //sei();                  // Global Interrupts aktivieren
 }
 
 
@@ -190,10 +190,11 @@ int main(void)
   SetSpiToHwAdressMode();
   //_delay_ms(20);
   ui.Init();
+  sei();                  // Global Interrupts aktivieren
 
   while(1)
   {
-    Debug2::Toggle();
+    //Debug2::Toggle();
     //_delay_ms(5);
     ui.Poll();
     ui.Do();

@@ -10,11 +10,23 @@
 
 Routing routing;
 
+int8_t  eeData[OutputCount] EEMEM = {0,0,0,0,0,0,0,0,0,0};
+/*uint8_t  eeData0[OutputCount] EEMEM = {0};
+uint8_t  eeData1[OutputCount] EEMEM = {0};
+uint8_t  eeData2[OutputCount] EEMEM = {0};
+uint8_t  eeData3[OutputCount] EEMEM = {0};
+uint8_t  eeData4[OutputCount] EEMEM = {0};
+uint8_t  eeData5[OutputCount] EEMEM = {0};
+uint8_t  eeData6[OutputCount] EEMEM = {0};
+uint8_t  eeData7[OutputCount] EEMEM = {0};
+uint8_t  eeData8[OutputCount] EEMEM = {0};
+uint8_t  eeData9[OutputCount] EEMEM = {0};
+*/
 Routing::Routing()
 : m_RouteBeginOut(NIL)
 , m_RouteBeginIn(NIL)
 {
-  for(int8_t i=0; i<10; i++)
+  for(int8_t i=0; i<OutputCount; i++)
   {
     m_MiOuts[i] = NIL;
   }
@@ -43,6 +55,11 @@ void Routing::setRoute(int8_t out, int8_t in)
     *MB[out] = MB_Bits[in-2];
     *MA[out] = 0;
   }
+
+  TIMSK0 &= ~(1 << OCIE0A);
+  writeDefaultData();
+  TIMSK0 |= (1 << OCIE0A);
+
 }
 void Routing::setRouteByBeginOut(int8_t in)
 {
@@ -60,6 +77,11 @@ void Routing::unRoute(int8_t out)
   m_MiOuts[out] = NIL;
   *MA[out] = 0;
   *MB[out] = 0;
+
+  //TIMSK0 &= ~(1 << OCIE0A);
+  writeDefaultData();
+  //TIMSK0 |= (1 << OCIE0A);
+
 }
 void Routing::setRouteBeginOut(int8_t out)
 {
@@ -76,7 +98,7 @@ void Routing::setRouteBeginIn(int8_t in)
 uint16_t Routing::getOutBitsByIn(int8_t in)
 {
   uint16_t out = 0;
-  for(int8_t i=0; i<10; i++)
+  for(int8_t i=0; i<OutputCount; i++)
   {
     if(m_MiOuts[i] == in)
       out |= 1 << i;
@@ -94,5 +116,16 @@ uint16_t Routing::getOutBitsByBeginIn(void)
 }
 bool Routing::isRouted(int8_t out) const
 {
-  return m_MiOuts[out] != NIL;
+  const int8_t data = m_MiOuts[out];
+  return (data < OutputCount && data >= 0);
+}
+
+void Routing::readDefaultData(void)
+{
+  eeprom_read_block (m_MiOuts, eeData, OutputCount);
+}
+
+void Routing::writeDefaultData(void)
+{
+  eeprom_write_block (m_MiOuts, eeData, OutputCount);
 }
