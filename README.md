@@ -1,6 +1,6 @@
 ## Midi Matrix
 * 10 inputs
 * 10 outputs
-* 4 patch memories
-* MIDI clock merge (possibly)
+* lots of patch memories
+* MIDI clock merge (possibly, but sparse performance)
 * AVR based
