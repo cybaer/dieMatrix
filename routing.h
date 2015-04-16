@@ -14,6 +14,8 @@
 static const int8_t OutputCount = 10;
 static const int8_t InputCount = 10;
 
+extern uint8_t midi_1_2;
+extern uint8_t midi_3_10;
 extern uint8_t* MA[];
 extern uint8_t* MB[];
 
@@ -33,6 +35,8 @@ public:
   bool isRouted(int8_t out) const;
   void readDefaultData(void);
   void writeDefaultData(void);
+  uint16_t getScanBitsIn(void);
+  uint16_t getScanBitsOut(void);
 private:
   int8_t m_MiOuts[10];
   uint8_t MA_Bits[2];

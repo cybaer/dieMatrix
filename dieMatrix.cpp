@@ -40,6 +40,9 @@ static uint8_t MB_8 = 0x00;
 static uint8_t MB_9 = 0x00;
 static uint8_t MB_10 = 0x00;
 
+uint8_t midi_1_2;
+uint8_t midi_3_10;
+
 uint8_t* MA[] = {&MA_1, &MA_2, &MA_3, &MA_4, &MA_5, &MA_6, &MA_7, &MA_8, &MA_9, &MA_10};
 uint8_t* MB[] = {&MB_1, &MB_2, &MB_3, &MB_4, &MB_5, &MB_6, &MB_7, &MB_8, &MB_9, &MB_10};
 
@@ -99,8 +102,8 @@ ISR (TIMER0_COMPA_vect)
 {
   Debug1::set_value(true);
 
-  uint8_t midi_1_2 = MidiIn_1_2.Read();
-  uint8_t midi_3_10 = MidiIn_3_10.Read();
+  midi_1_2 = MidiIn_1_2.Read();
+  midi_3_10 = MidiIn_3_10.Read();
 
   MidiOut1::set_value((midi_3_10 & MB_1) || (midi_1_2 & MA_1));
   MidiOut2::set_value((midi_3_10 & MB_2) || (midi_1_2 & MA_2));

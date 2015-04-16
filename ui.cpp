@@ -69,6 +69,11 @@ void Ui::Do(void)
   {
     m_State->onOutputClick(*this, modeIndex);
   }
+  if(isScanMode())
+  {
+    m_InputLEDs.set(routing.getScanBitsIn());
+    m_OutputLEDs.set(routing.getScanBitsOut());
+  }
 
   portExtender1::WriteIO();
   portExtender2::WriteIO();
@@ -100,6 +105,11 @@ void Ui::CScanState::onEntry(Ui& context) const
 {
   context.m_ModeLEDs.clear();
   context.m_ModeLEDs.m_LedArray[0]->set();
+}
+void Ui::CScanState::onExit(Ui& context) const
+{
+  context.m_OutputLEDs.clear();
+  context.m_InputLEDs.clear();
 }
 void Ui::CScanState::onModeClick(Ui& context, int8_t index) const
 {
@@ -231,6 +241,11 @@ void Ui::testSwitchLED(void)
     else
       m_ModeLEDs.m_LedArray[i]->set();
   }
+}
+
+bool Ui::isScanMode()
+{
+  return m_State == &Ui::CScanState::getInstance();
 }
 
 

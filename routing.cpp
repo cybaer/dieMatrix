@@ -129,3 +129,12 @@ void Routing::writeDefaultData(void)
 {
   eeprom_write_block (m_MiOuts, eeData, OutputCount);
 }
+
+uint16_t Routing::getScanBitsIn(void)
+{
+  return 3;
+}
+uint16_t Routing::getScanBitsOut(void)
+{
+  return 8;
+}

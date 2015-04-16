@@ -34,6 +34,7 @@ public:
 
 private:
   void testSwitchLED(void);
+  bool isScanMode(void);
 
   class IUiState;
   IUiState& determineNextModeState(int8_t modeSwitch);
@@ -90,6 +91,7 @@ private:
       return s_instance;
     }
     virtual void onEntry(Ui&) const;
+    virtual void onExit(Ui&) const;
     virtual void onModeClick(Ui&, int8_t index) const;
   };
   class CRoutingState: public IUiState
