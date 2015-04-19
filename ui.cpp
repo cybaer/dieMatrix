@@ -39,9 +39,10 @@ void Ui::Init(void)
   portExtender1::Init();
   portExtender2::Init();
   portExtender3::Init();
-  Debug2::High();
+  //Debug2::High();
   routing.readDefaultData();
-  Debug2::Low();
+  routing.setAllRoutes();
+  //Debug2::Low();
 }
 
 void Ui::Poll(void)
@@ -73,6 +74,7 @@ void Ui::Do(void)
   {
     m_InputLEDs.set(routing.getScanBitsIn());
     m_OutputLEDs.set(routing.getScanBitsOut());
+    routing.resetScanBits();
   }
 
   portExtender1::WriteIO();

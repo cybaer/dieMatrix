@@ -10,7 +10,7 @@
 
 Routing routing;
 
-int8_t  eeData[OutputCount] EEMEM = {0,0,0,0,0,0,0,0,0,0};
+int8_t  eeData[OutputCount] EEMEM ;//= {0,0,0,0,0,0,0,0,0,0};
 /*uint8_t  eeData0[OutputCount] EEMEM = {0};
 uint8_t  eeData1[OutputCount] EEMEM = {0};
 uint8_t  eeData2[OutputCount] EEMEM = {0};
@@ -132,9 +132,77 @@ void Routing::writeDefaultData(void)
 
 uint16_t Routing::getScanBitsIn(void)
 {
-  return 3;
+  uint8_t in = ~ScanData_3_10;
+  uint16_t bits = 0;
+
+  for(int8_t i=9; i>=0; i--)
+  {
+    if(in & MB_Bits[i])
+        bits |= 1;
+      bits <<= 1;
+  }
+
+  in = ~ScanData_1_2;
+  ScanData_1_2 = 0xFF;
+
+
+  if(in & MA_Bits[1])
+    bits |= 1;
+  bits <<= 1;
+  if(in & MA_Bits[0])
+    bits |= 1;
+
+  return bits;
 }
 uint16_t Routing::getScanBitsOut(void)
 {
-  return 8;
+  uint8_t in_A = ~ScanData_1_2;
+  uint8_t in_B = ~ScanData_3_10;
+  uint16_t bits = 0;
+
+  for(int8_t i=9; i>=0; i--)
+  {
+    int8_t input= m_MiOuts[i];
+    if(input != NIL)
+    {
+      if(input < 2)
+      {
+        if(in_A & MA_Bits[input])
+          bits |= 1;
+      }
+      else
+      {
+        if(in_B & MB_Bits[input-2])
+          bits |= 1;
+      }
+    }
+    bits <<= 1;
+  }
+  bits >>= 1;
+  return bits;
+}
+
+void Routing::setAllRoutes(void)
+{
+  for(int8_t i=0; i<OutputCount; i++)
+  {
+    int8_t in = m_MiOuts[i];
+
+    if(in == NIL)
+    {
+      *MA[i] = 0;
+      *MB[i] = 0;
+      continue;
+    }
+    if(in < 2)
+    {
+      *MA[i] = MA_Bits[in];
+      *MB[i] = 0;
+    }
+    else
+    {
+      *MB[i] = MB_Bits[in-2];
+      *MA[i] = 0;
+    }
+  }
 }
